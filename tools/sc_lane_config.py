@@ -8,10 +8,10 @@ from models.model.sc_lane import SCLane
 ''' data split '''
 train_gt_paths = '/media/vdcl/T9/openlane/training'
 train_image_paths = '/media/vdcl/T9/openlane/images/training'
-train_map_paths = '/media/vdcl/T9/Waymo/map_data_training'
+train_map_paths = '/media/vdcl/T9/openlane/heightmap_train'
 val_gt_paths = '/media/vdcl/T9/openlane/validation'
 val_image_paths = '/media/vdcl/T9/openlane/images/validation'
-val_map_paths = '/media/vdcl/T9/Waymo/map_data_validation'
+val_map_paths = '/media/vdcl/T9/openlane/heightmap_validation''
 
 model_save_path = "./checkpoints/sc_lane"
 
@@ -33,7 +33,7 @@ loader_args = dict(
 ''' model '''
 def model():
     return SCLane(bev_shape=bev_shape, image_shape=input_shape, output_2d_shape=output_2d_shape,
-                  train=True, use_img=True, x_range=x_range, y_range=y_range, meter_per_pixel=meter_per_pixel)
+                  train=True, use_img=False, x_range=x_range, y_range=y_range, meter_per_pixel=meter_per_pixel)
 
 def val_model():
     return SCLane(bev_shape=bev_shape, image_shape=input_shape, output_2d_shape=output_2d_shape,

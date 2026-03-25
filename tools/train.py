@@ -26,6 +26,8 @@ class CustomSmoothL1Loss(nn.Module):
         masked_loss = loss * mask
         loss_sum = masked_loss.sum()
         num_valid = mask.sum()
+        if num_valid == 0:
+            return loss_sum * 0.0
         return loss_sum / num_valid
     
 class CustomConsistencyLoss(nn.Module):
@@ -133,7 +135,7 @@ class reproject_prev_heightmap(nn.Module):
         filtered_prev_to_curr_points_cam = torch.cat([prev_to_curr_points_cam, torch.ones(B, 1, prev_to_curr_points_cam.shape[2], device=device)], dim=1)  # (B, 4, HW)
 
         # waymo camera coord to current road coord
-        curr_lane2persformer = torch.linalg.inv(curr_road2cam)  # (B, 4, 4)
+        curr_lane2persformer = torch.inverse(curr_road2cam.cpu()).to(device)  # (B, 4, 4)
         new_roi = torch.bmm(curr_lane2persformer, filtered_prev_to_curr_points_cam) # (B, 4, HW)
         ipm_roi = torch.stack([206 - 2 * new_roi[:, 1, :], 24 + 2 * new_roi[:, 0, :], new_roi[:, 2, :]], dim=1)  # (B, 3, HW)
 
@@ -178,7 +180,7 @@ class Combine_Model_and_Loss(torch.nn.Module):
         loss_total = 5 * loss_seg + loss_emb
         loss_total = loss_total.unsqueeze(0)
         loss_offset = 60 * loss_offset.unsqueeze(0)
-        loss_height = 10 * loss_height.unsqueeze(0) 
+        loss_height = 10 * loss_height.unsqueeze(0)
         loss_consistency = 3 * loss_consistency.unsqueeze(0)
         
 
